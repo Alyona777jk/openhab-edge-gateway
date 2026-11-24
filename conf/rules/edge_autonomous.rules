@@ -1,0 +1,33 @@
+var Number tempSetpoint = 21.5
+var Number tempHysteresis = 0.5
+var Number co2Threshold = 900
+
+rule "Edge Autonomous Climate Control"
+when
+    Item Edge_Zone1_Temp changed or
+    Item Edge_Zone1_CO2 changed
+then
+    // 1. Автономне керування опаленням з гістерезисом (zero-cloud latency)
+    if (Edge_Zone1_Temp.state instanceof QuantityType) {
+        val currentTemp = (Edge_Zone1_Temp.state as QuantityType<Number>).doubleValue
+        if (currentTemp < (tempSetpoint - tempHysteresis) && Edge_Zone1_Heater.state != ON) {
+            Edge_Zone1_Heater.sendCommand(ON)
+            logInfo("EDGE_DECISION", "Local Heater ON: Temp=" + currentTemp + "C")
+        } else if (currentTemp > (tempSetpoint + tempHysteresis) && Edge_Zone1_Heater.state != OFF) {
+            Edge_Zone1_Heater.sendCommand(OFF)
+            logInfo("EDGE_DECISION", "Local Heater OFF: Temp=" + currentTemp + "C")
+        }
+    }
+
+    // 2. Автономна вентиляція за рівнем CO2
+    if (Edge_Zone1_CO2.state instanceof Number) {
+        val currentCO2 = (Edge_Zone1_CO2.state as Number).intValue
+        if (currentCO2 > co2Threshold && Edge_Zone1_Fan.state != ON) {
+            Edge_Zone1_Fan.sendCommand(ON)
+            logInfo("EDGE_DECISION", "Edge Ventilation ON: CO2=" + currentCO2 + "ppm")
+        } else if (currentCO2 <= (co2Threshold - 150) && Edge_Zone1_Fan.state != OFF) {
+            Edge_Zone1_Fan.sendCommand(OFF)
+            logInfo("EDGE_DECISION", "Edge Ventilation OFF: CO2=" + currentCO2 + "ppm")
+        }
+    }
+end

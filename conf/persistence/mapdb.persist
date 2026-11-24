@@ -1,0 +1,6 @@
+Strategies {
+    default = everyChange
+}
+Items {
+    Edge_Zone1_Fan, Edge_Zone1_Heater, Edge_Operation_Mode, Edge_Buffered_Events : strategy = everyChange, restoreOnStartup
+}

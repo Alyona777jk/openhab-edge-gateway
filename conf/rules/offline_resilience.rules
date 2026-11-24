@@ -1,0 +1,36 @@
+rule "System Started Edge Init"
+when
+    System started
+then
+    if (Edge_Buffered_Events.state == NULL) Edge_Buffered_Events.postUpdate(0)
+    if (Edge_Operation_Mode.state == NULL) Edge_Operation_Mode.postUpdate("ISOLATED_EDGE_READY")
+end
+
+rule "Monitor Network & Graceful Degradation"
+when
+    Item Edge_Network_Online changed
+then
+    if (Edge_Network_Online.state == OFF) {
+        Edge_Operation_Mode.postUpdate("OFFLINE_AUTONOMOUS")
+        logWarn("EDGE_NET", "Зовнішній шлюз недоступний. Перехід у повний автономний режим.")
+    } else if (Edge_Network_Online.state == ON) {
+        Edge_Operation_Mode.postUpdate("ONLINE_LOCAL_SYNC")
+        val buffered = if (Edge_Buffered_Events.state instanceof Number) (Edge_Buffered_Events.state as Number).intValue else 0
+        if (buffered > 0) {
+            logInfo("EDGE_SYNC", "Канал відновлено. Локальна синхронізація " + buffered + " буферизованих подій...")
+            Edge_Buffered_Events.postUpdate(0)
+        }
+    }
+end
+
+rule "Buffer Critical Events When Offline"
+when
+    Item Edge_Zone1_Heater changed or
+    Item Edge_Zone1_Fan changed
+then
+    if (Edge_Network_Online.state == OFF) {
+        val currentCount = if (Edge_Buffered_Events.state instanceof Number) (Edge_Buffered_Events.state as Number).intValue else 0
+        Edge_Buffered_Events.postUpdate(currentCount + 1)
+        Edge_Last_Local_Backup.postUpdate(new DateTimeType())
+    }
+end

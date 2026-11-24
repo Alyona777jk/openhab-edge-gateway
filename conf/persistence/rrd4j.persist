@@ -1,0 +1,7 @@
+Strategies {
+    everyMinute : "0 * * * * ?"
+    default = everyChange
+}
+Items {
+    Edge_Zone1_Temp, Edge_Zone1_Hum, Edge_Zone1_CO2 : strategy = everyMinute, restoreOnStartup
+}

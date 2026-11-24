@@ -1,0 +1,20 @@
+sitemap edge_dashboard label="Smart Home Edge Gateway (Local)" {
+    Frame label="Статус Edge-вузла та автономності" {
+        Text item=Edge_Operation_Mode valuecolor=["OFFLINE_AUTONOMOUS"="orange", "ONLINE_LOCAL_SYNC"="green"]
+        Text item=Edge_Network_Online label="Зв'язок зі шлюзом [MAP(en.map):%s]"
+        Text item=Edge_Buffered_Events visibility=[Edge_Buffered_Events>0]
+        Text item=Edge_Last_Local_Backup
+    }
+    Frame label="Локальна телеметрія (Zero-Cloud)" {
+        Text item=Edge_Zone1_Temp
+        Text item=Edge_Zone1_Hum
+        Text item=Edge_Zone1_CO2 valuecolor=[>900="red", >750="orange", <=750="green"]
+    }
+    Frame label="Автономні актуатори" {
+        Switch item=Edge_Zone1_Heater
+        Switch item=Edge_Zone1_Fan
+    }
+    Frame label="Локальна аналітика (RRD4J)" {
+        Chart item=Edge_Zone1_Temp period=h refresh=10000
+    }
+}

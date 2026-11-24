@@ -1,0 +1,17 @@
+// Локальний MQTT брокер на Edge-вузлі
+Bridge mqtt:broker:local_edge_broker [ host="mosquitto", port=1883, secure=false, clientID="openhab_edge_core" ] {
+    Thing topic climate_node_01 "Edge Climate Sensor" {
+        Channels:
+            Type number : temperature "Temperature" [ stateTopic="edge/zone1/temp" ]
+            Type number : humidity "Humidity" [ stateTopic="edge/zone1/hum", unit="%" ]
+            Type number : co2 "CO2 Level" [ stateTopic="edge/zone1/co2" ]
+    }
+    Thing topic actuator_node_01 "Edge HVAC & Relay" {
+        Channels:
+            Type switch : ventilation "Ventilation Fan" [ stateTopic="edge/zone1/fan/state", commandTopic="edge/zone1/fan/set", on="ON", off="OFF" ]
+            Type switch : heater "Local Heater" [ stateTopic="edge/zone1/heater/state", commandTopic="edge/zone1/heater/set", on="ON", off="OFF" ]
+    }
+}
+
+// Локальний сенсор перевірки шлюзу (перевірка локальної мережі, не хмари)
+Thing network:pingdevice:wan_gateway [ hostname="192.168.1.1", retry=2, timeout=2000, refreshInterval=15000 ]

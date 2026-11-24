@@ -1,0 +1,28 @@
+services:
+  mosquitto:
+    image: eclipse-mosquitto:2.0
+    container_name: edge_mqtt_broker
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:1883:1883"
+    volumes:
+      - ./mosquitto_conf/mosquitto.conf:/mosquitto/config/mosquitto.conf:ro
+
+  openhab:
+    image: openhab/openhab:4.2.0
+    container_name: openhab_edge_gateway
+    restart: unless-stopped
+    depends_on:
+      - mosquitto
+    ports:
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - ./conf:/openhab/conf
+      - ./addons:/openhab/addons
+      - openhab_userdata:/openhab/userdata
+    environment:
+      - OPENHAB_HTTP_PORT=8080
+      - EXTRA_JAVA_OPTS=-Xms256m -Xmx512m
+
+volumes:
+  openhab_userdata:

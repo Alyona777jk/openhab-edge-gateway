@@ -1,0 +1,3 @@
+mosquitto_conf/
+userdata/
+*.log

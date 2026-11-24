@@ -1,0 +1,14 @@
+// Сенсори середовища
+Number:Temperature Edge_Zone1_Temp "Температура [%.1f °C]" <temperature> { channel="mqtt:topic:local_edge_broker:climate_node_01:temperature" }
+Number:Dimensionless Edge_Zone1_Hum "Вологість [%.0f %%]" <humidity> { channel="mqtt:topic:local_edge_broker:climate_node_01:humidity" }
+Number Edge_Zone1_CO2 "Рівень CO2 [%d ppm]" <carbondioxide> { channel="mqtt:topic:local_edge_broker:climate_node_01:co2" }
+
+// Виконавчі механізми
+Switch Edge_Zone1_Fan "Вентиляція (Авто)" <fan> { channel="mqtt:topic:local_edge_broker:actuator_node_01:ventilation" }
+Switch Edge_Zone1_Heater "Обігрів (Авто)" <fire> { channel="mqtt:topic:local_edge_broker:actuator_node_01:heater" }
+
+// Системні індикатори Edge Gateway (Offline / Autonomous state)
+Switch Edge_Network_Online "Локальний шлюз" <network> { channel="network:pingdevice:wan_gateway:online" }
+String Edge_Operation_Mode "Режим роботи шлюзу [%s]" <shield>
+Number Edge_Buffered_Events "Несинхронізовані події [%d]" <database>
+DateTime Edge_Last_Local_Backup "Останній локальний бекап [%1$tH:%1$tM:%1$tS]" <time>
